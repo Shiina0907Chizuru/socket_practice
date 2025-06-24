@@ -1,0 +1,51 @@
+[
+  {
+    "connection_id": "test_client",
+    "type": "THREE_WAY_HANDSHAKE",
+    "step": 1,
+    "timestamp": "2025-06-25T02:39:40.891855",
+    "details": "客户端发送SYN包到服务器，seq=x"
+  },
+  {
+    "connection_id": "test_client",
+    "type": "THREE_WAY_HANDSHAKE",
+    "step": 2,
+    "timestamp": "2025-06-25T02:39:40.992972",
+    "details": "收到服务器SYN+ACK包，seq=y, ack=x+1"
+  },
+  {
+    "connection_id": "test_client",
+    "type": "THREE_WAY_HANDSHAKE",
+    "step": 3,
+    "timestamp": "2025-06-25T02:39:41.105503",
+    "details": "客户端发送ACK包，ack=y+1，握手完成"
+  },
+  {
+    "connection_id": "test_client",
+    "type": "FOUR_WAY_TEARDOWN",
+    "step": 1,
+    "timestamp": "2025-06-25T02:39:41.117664",
+    "details": "客户端发送FIN包，请求关闭连接"
+  },
+  {
+    "connection_id": "test_client",
+    "type": "FOUR_WAY_TEARDOWN",
+    "step": 2,
+    "timestamp": "2025-06-25T02:39:41.227206",
+    "details": "收到服务器ACK确认"
+  },
+  {
+    "connection_id": "test_client",
+    "type": "FOUR_WAY_TEARDOWN",
+    "step": 3,
+    "timestamp": "2025-06-25T02:39:41.337830",
+    "details": "收到服务器FIN包"
+  },
+  {
+    "connection_id": "test_client",
+    "type": "FOUR_WAY_TEARDOWN",
+    "step": 4,
+    "timestamp": "2025-06-25T02:39:41.449970",
+    "details": "发送最后的ACK确认"
+  }
+]

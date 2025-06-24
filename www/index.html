@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket HTTP 服务器</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        .feature { background: #f8f9fa; padding: 20px; margin: 15px 0; border-radius: 5px; border-left: 4px solid #007bff; }
+        .api-section { background: #e9ecef; padding: 20px; margin: 15px 0; border-radius: 5px; }
+        .code { background: #343a40; color: #f8f9fa; padding: 10px; border-radius: 3px; font-family: 'Courier New', monospace; margin: 10px 0; }
+        .button { display: inline-block; background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 5px; }
+        .button:hover { background: #0056b3; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { background: #007bff; color: white; padding: 20px; border-radius: 5px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Socket HTTP 服务器</h1>
+        
+        <div class="feature">
+            <h2>服务器特性</h2>
+            <ul>
+                <li>基于原生Socket实现的HTTP/1.1服务器</li>
+                <li>静态文件服务支持</li>
+                <li>REST API 接口</li>
+                <li>多线程并发处理</li>
+                <li>详细的请求日志记录</li>
+                <li>实时服务器状态监控</li>
+            </ul>
+        </div>
+        
+        <div class="api-section">
+            <h2>API 接口测试</h2>
+            <p>以下是可用的API接口：</p>
+            <div class="code">
+                GET /api/status - 获取服务器状态<br>
+                GET /api/time - 获取服务器时间<br>
+                POST /api/echo - 回声测试（返回请求内容）<br>
+                GET /api/clients - 获取客户端连接信息
+            </div>
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="/api/status" class="button">服务器状态</a>
+                <a href="/api/time" class="button">服务器时间</a>
+                <a href="/api/clients" class="button">客户端信息</a>
+            </div>
+        </div>
+        
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <h3>服务器运行中</h3>
+                <p>Socket HTTP/1.1</p>
+            </div>
+            <div class="stat-card">
+                <h3>支持功能</h3>
+                <p>静态文件 + API</p>
+            </div>
+        </div>
+        
+        <div class="feature">
+            <h2>测试建议</h2>
+            <p>可以使用以下工具测试服务器：</p>
+            <ul>
+                <li><strong>浏览器:</strong> 直接访问各个页面和API</li>
+                <li><strong>curl:</strong> <code>curl http://localhost:8080/api/status</code></li>
+                <li><strong>网络性能测试器:</strong> 运行 network_performance_tester.py</li>
+                <li><strong>Postman:</strong> 测试POST请求</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // 自动刷新服务器状态
+        setInterval(function() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('stats').innerHTML = `
+                        <div class="stat-card">
+                            <h3>请求总数</h3>
+                            <p>${data.request_count}</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>活跃连接</h3>
+                            <p>${data.active_connections}</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>运行时间</h3>
+                            <p>${data.uptime}</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>服务器时间</h3>
+                            <p>${new Date(data.server_time).toLocaleTimeString()}</p>
+                        </div>
+                    `;
+                })
+                .catch(err => console.log('状态更新失败:', err));
+        }, 5000);
+    </script>
+</body>
+</html>

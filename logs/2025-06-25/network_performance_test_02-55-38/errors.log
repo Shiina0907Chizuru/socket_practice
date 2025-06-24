@@ -1,0 +1,12 @@
+2025-06-25 02:55:40,300 - ERROR - LATENCY_TEST_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。
+2025-06-25 02:55:42,339 - ERROR - LATENCY_TEST_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。
+2025-06-25 02:55:44,377 - ERROR - LATENCY_TEST_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。
+2025-06-25 02:55:46,421 - ERROR - LATENCY_TEST_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。
+2025-06-25 02:55:48,450 - ERROR - LATENCY_TEST_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。
+2025-06-25 02:55:50,497 - ERROR - THROUGHPUT_TEST_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。
+2025-06-25 02:55:52,536 - ERROR - THROUGHPUT_TEST_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。
+2025-06-25 02:55:54,566 - ERROR - CONCURRENT_CONNECTION_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。 [Context: connection_1]
+2025-06-25 02:55:54,673 - ERROR - CONCURRENT_CONNECTION_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。 [Context: connection_2]
+2025-06-25 02:55:54,766 - ERROR - CONCURRENT_CONNECTION_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。 [Context: connection_3]
+2025-06-25 02:55:54,875 - ERROR - CONCURRENT_CONNECTION_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。 [Context: connection_4]
+2025-06-25 02:55:54,966 - ERROR - CONCURRENT_CONNECTION_ERROR: [WinError 10061] 由于目标计算机积极拒绝，无法连接。 [Context: connection_5]
