@@ -1,0 +1,30 @@
+[
+  {
+    "connection_id": "CONN_2",
+    "type": "THREE_WAY_HANDSHAKE",
+    "step": 1,
+    "timestamp": "2025-06-25T23:02:41.574625",
+    "details": "服务器处于监听状态，等待客户端连接"
+  },
+  {
+    "connection_id": "CONN_2",
+    "type": "THREE_WAY_HANDSHAKE",
+    "step": 2,
+    "timestamp": "2025-06-25T23:02:41.586794",
+    "details": "收到客户端SYN包，seq=x"
+  },
+  {
+    "connection_id": "CONN_2",
+    "type": "THREE_WAY_HANDSHAKE",
+    "step": 3,
+    "timestamp": "2025-06-25T23:02:41.607917",
+    "details": "服务器发送SYN+ACK包，seq=y, ack=x+1"
+  },
+  {
+    "connection_id": "CONN_2",
+    "type": "THREE_WAY_HANDSHAKE",
+    "step": 4,
+    "timestamp": "2025-06-25T23:02:41.627422",
+    "details": "收到客户端ACK包，ack=y+1，握手完成"
+  }
+]

@@ -692,24 +692,54 @@ class ChatClientGUI:
                 
                 if len(data) == data_length:
                     try:
-                        # 尝试解析为JSON（用于图片等结构化数据）
+                        # 尝试解析为JSON（用于结构化消息）
                         message_data = json.loads(data.decode('utf-8'))
-                        if message_data.get('type') == 'image':
+                        message_type = message_data.get('type', 'unknown')
+                        
+                        if message_type == 'image':
                             # 处理图片消息
                             image_data = base64.b64decode(message_data['data'])
                             image_file = io.BytesIO(image_data)
                             username = message_data.get('username', '未知用户')
                             avatar_data = message_data.get('avatar')
                             filename = message_data.get('filename', 'unknown')
-                            self.add_message(username, f"发送了图片: {filename}", "blue", "image", image_file, avatar_data)
+                            
+                            # 判断是否是自己发送的消息
+                            if username == self.username:
+                                color = "green"  # 自己的消息显示为绿色
+                            else:
+                                color = "blue"   # 其他用户的消息显示为蓝色
+                            
+                            self.add_message(username, f"发送了图片: {filename}", color, "image", image_file, avatar_data)
+                            
+                        elif message_type == 'text':
+                            # 处理文本消息
+                            username = message_data.get('username', '未知用户')
+                            message_text = message_data.get('message', '')
+                            avatar_data = message_data.get('avatar')
+                            
+                            # 判断是否是自己发送的消息
+                            if username == self.username:
+                                # 自己的消息显示为绿色
+                                self.add_message(username, message_text, "green", "text", None, avatar_data)
+                            else:
+                                # 其他用户的消息显示为蓝色
+                                self.add_message(username, message_text, "blue", "text", None, avatar_data)
+                                
+                        elif message_type == 'system':
+                            # 处理系统消息
+                            message_text = message_data.get('message', '')
+                            self.add_message("系统", message_text, "orange", "text")
+                            
                         else:
-                            # 处理其他结构化消息
+                            # 处理其他类型的结构化消息
                             username = message_data.get('username', '服务器')
                             message_text = message_data.get('message', str(message_data))
                             avatar_data = message_data.get('avatar')
                             self.add_message(username, message_text, "blue", "text", None, avatar_data)
+                            
                     except json.JSONDecodeError:
-                        # 普通文本消息
+                        # 普通文本消息（服务器回复）
                         message = data.decode('utf-8')
                         self.add_message("服务器", message, "blue")
                 
@@ -750,9 +780,8 @@ class ChatClientGUI:
             length = len(data).to_bytes(4, byteorder='big')
             self.client_socket.send(length + data)
             
-            # 在本地显示发送的消息
-            self.add_message(self.username, message, "green", "text", None, self.avatar_base64)
-            self.message_var.set("")  # 清空输入框
+            # 清空输入框
+            self.message_var.set("")
             
             # 如果发送了quit命令，断开连接
             if message.lower() == 'quit':
@@ -813,8 +842,7 @@ class ChatClientGUI:
             length = len(data).to_bytes(4, byteorder='big')
             self.client_socket.send(length + data)
             
-            # 在本地显示发送的图片
-            self.add_message(self.username, f"发送了图片: {os.path.basename(file_path)}", "green", "image", file_path, self.avatar_base64)
+            # 记录日志但不在本地显示（等待服务器广播）
             self.logger.info(f"发送图片: {file_path}")
             
         except Exception as e:

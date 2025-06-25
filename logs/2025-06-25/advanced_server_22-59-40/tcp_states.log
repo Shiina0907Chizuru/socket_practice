@@ -1,0 +1,23 @@
+2025-06-25 23:00:39,281 - TCP - Connection[CONN_1] CLOSED -> CLOSED (连接初始化)
+2025-06-25 23:00:39,282 - TCP - Connection[CONN_1] CLOSED -> LISTEN (服务器监听状态)
+2025-06-25 23:00:39,282 - TCP - Connection[CONN_1] THREE_WAY_HANDSHAKE Step1: 服务器处于监听状态，等待客户端连接
+2025-06-25 23:00:39,294 - TCP - Connection[CONN_1] LISTEN -> SYN_RCVD (收到客户端SYN包)
+2025-06-25 23:00:39,294 - TCP - Connection[CONN_1] THREE_WAY_HANDSHAKE Step2: 收到客户端SYN包，seq=x
+2025-06-25 23:00:39,316 - TCP - Connection[CONN_1] THREE_WAY_HANDSHAKE Step3: 服务器发送SYN+ACK包，seq=y, ack=x+1
+2025-06-25 23:00:39,338 - TCP - Connection[CONN_1] SYN_RCVD -> ESTABLISHED (连接建立成功)
+2025-06-25 23:00:39,338 - TCP - Connection[CONN_1] THREE_WAY_HANDSHAKE Step4: 收到客户端ACK包，ack=y+1，握手完成
+2025-06-25 23:01:27,936 - TCP - Connection[CONN_1] FOUR_WAY_TEARDOWN Step1: 收到客户端FIN包，开始挥手过程
+2025-06-25 23:01:27,938 - TCP - Connection[CONN_1] ESTABLISHED -> CLOSE_WAIT (收到FIN，进入CLOSE_WAIT)
+2025-06-25 23:01:27,948 - TCP - Connection[CONN_1] FOUR_WAY_TEARDOWN Step2: 服务器发送ACK确认客户端FIN
+2025-06-25 23:01:27,972 - TCP - Connection[CONN_1] FOUR_WAY_TEARDOWN Step3: 服务器发送FIN包，准备关闭连接
+2025-06-25 23:01:27,985 - TCP - Connection[CONN_1] CLOSE_WAIT -> LAST_ACK (发送FIN，等待最后ACK)
+2025-06-25 23:01:27,995 - TCP - Connection[CONN_1] FOUR_WAY_TEARDOWN Step4: 收到客户端最后ACK，挥手完成
+2025-06-25 23:01:28,007 - TCP - Connection[CONN_1] LAST_ACK -> CLOSED (连接完全关闭)
+2025-06-25 23:02:41,573 - TCP - Connection[CONN_2] CLOSED -> CLOSED (连接初始化)
+2025-06-25 23:02:41,574 - TCP - Connection[CONN_2] CLOSED -> LISTEN (服务器监听状态)
+2025-06-25 23:02:41,574 - TCP - Connection[CONN_2] THREE_WAY_HANDSHAKE Step1: 服务器处于监听状态，等待客户端连接
+2025-06-25 23:02:41,586 - TCP - Connection[CONN_2] LISTEN -> SYN_RCVD (收到客户端SYN包)
+2025-06-25 23:02:41,586 - TCP - Connection[CONN_2] THREE_WAY_HANDSHAKE Step2: 收到客户端SYN包，seq=x
+2025-06-25 23:02:41,607 - TCP - Connection[CONN_2] THREE_WAY_HANDSHAKE Step3: 服务器发送SYN+ACK包，seq=y, ack=x+1
+2025-06-25 23:02:41,627 - TCP - Connection[CONN_2] SYN_RCVD -> ESTABLISHED (连接建立成功)
+2025-06-25 23:02:41,627 - TCP - Connection[CONN_2] THREE_WAY_HANDSHAKE Step4: 收到客户端ACK包，ack=y+1，握手完成

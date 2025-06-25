@@ -1,0 +1,4 @@
+2025-06-25 23:11:55,206 - CONN - CLIENT_DISCONNECTED: {"connection_id": "CONN_1", "client_address": ["127.0.0.1", 54535], "active_connections": 0}
+2025-06-25 23:11:55,822 - CONN - CLIENT_DISCONNECTED: {"connection_id": "CONN_2", "client_address": ["127.0.0.1", 54546], "active_connections": 1}
+2025-06-25 23:11:56,133 - CONN - CLIENT_DISCONNECTED: {"connection_id": "CONN_3", "client_address": ["127.0.0.1", 54547], "active_connections": 1}
+2025-06-25 23:11:56,425 - CONN - CLIENT_DISCONNECTED: {"connection_id": "CONN_4", "client_address": ["127.0.0.1", 54549], "active_connections": 0}

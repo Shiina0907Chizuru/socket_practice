@@ -1,0 +1,4 @@
+2025-06-25 23:00:39,281 - CONN - CONNECTION_CREATED: {"connection_id": "CONN_1", "type": "SERVER", "timestamp": "2025-06-25T23:00:39.281697"}
+2025-06-25 23:00:39,349 - CONN - CLIENT_CONNECTED: {"connection_id": "CONN_1", "client_ip": "127.0.0.1", "client_port": 54025, "total_connections": 1}
+2025-06-25 23:02:41,573 - CONN - CONNECTION_CREATED: {"connection_id": "CONN_2", "type": "SERVER", "timestamp": "2025-06-25T23:02:41.573910"}
+2025-06-25 23:02:41,635 - CONN - CLIENT_CONNECTED: {"connection_id": "CONN_2", "client_ip": "127.0.0.1", "client_port": 54732, "total_connections": 2}
