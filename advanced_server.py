@@ -93,7 +93,7 @@ class AdvancedSocketServer:
                 self.connection_count += 1
                 connection_id = f"CONN_{self.connection_count}"
                 
-                # 记录连接建立
+                # 记录连接建立 - 简化版本
                 connection_info = {
                     'connection_id': connection_id,
                     'client_address': address,
@@ -105,25 +105,51 @@ class AdvancedSocketServer:
                 self.stats['total_connections'] += 1
                 self.stats['active_connections'] += 1
                 
-                # 创建TCP连接分析
-                tcp_conn = self.tcp_analyzer.create_connection(connection_id, "SERVER")
-                tcp_conn.simulate_server_handshake()
-                
-                # 记录连接事件
-                self.logger.log_connection_event("CLIENT_CONNECTED", {
-                    'connection_id': connection_id,
-                    'client_ip': address[0],
-                    'client_port': address[1],
-                    'total_connections': self.stats['total_connections']
-                })
-                
-                self.logger.log_performance_metric("活跃连接数", self.stats['active_connections'])
-                
                 print(f"新客户端连接: {address} -> {connection_id}")
                 print(f"当前活跃连接: {self.stats['active_connections']}")
                 
-                # 设置客户端socket超时，避免recv()阻塞
-                client_socket.settimeout(30.0)  # 30秒超时
+                print(f"[DEBUG] ===== 准备启动TCP分析线程: {connection_id} =====")
+                
+                # 创建TCP连接分析 - 异步执行，不阻塞socket
+                def async_tcp_analysis():
+                    try:
+                        print(f"[DEBUG] 开始异步TCP分析: {connection_id}")
+                        tcp_conn = self.tcp_analyzer.create_connection(connection_id, "SERVER")
+                        # 异步执行握手分析，不影响实际socket通信
+                        print(f"[DEBUG] 开始三次握手分析: {connection_id}")
+                        tcp_conn.simulate_server_handshake()
+                        print(f"[DEBUG] 三次握手分析完成: {connection_id}")
+                        
+                        # 记录连接事件到日志
+                        self.logger.log_connection_event("CLIENT_CONNECTED", {
+                            'connection_id': connection_id,
+                            'client_ip': address[0],
+                            'client_port': address[1],
+                            'total_connections': self.stats['total_connections']
+                        })
+                        print(f"[DEBUG] 连接事件已记录: {connection_id}")
+                        
+                        # 给日志写入一些时间
+                        import time
+                        time.sleep(0.1)
+                        
+                    except Exception as e:
+                        print(f"TCP分析错误: {e}")
+                        import traceback
+                        traceback.print_exc()
+                
+                # 在单独线程中执行TCP分析，避免阻塞
+                analysis_thread = threading.Thread(target=async_tcp_analysis, daemon=False)  # 非daemon线程
+                print(f"[DEBUG] TCP分析线程已创建: {connection_id}")
+                analysis_thread.start()
+                print(f"[DEBUG] TCP分析线程已启动: {connection_id}")
+                # 将线程添加到管理列表中，以便稍后等待完成
+                if not hasattr(self, 'analysis_threads'):
+                    self.analysis_threads = []
+                self.analysis_threads.append(analysis_thread)
+                
+                # 移除socket超时设置，保持与基础服务器一致
+                # client_socket.settimeout(30.0)  # 注释掉超时设置
                 
                 # 为每个客户端创建处理线程
                 client_thread = threading.Thread(
@@ -136,18 +162,21 @@ class AdvancedSocketServer:
                 
             except Exception as e:
                 if self.running:
-                    self.logger.log_error("CONNECTION_ACCEPT_ERROR", str(e))
                     print(f"接受连接时发生错误: {e}")
     
     def handle_client(self, client_socket, connection_id, address):
-        """处理客户端连接 - 简化版本，专注于基本消息收发"""
+        """处理客户端连接 - 优化版本，减少阻塞操作"""
         try:
-            self.logger.info(f"开始处理客户端 {connection_id}")
-            
-            # 发送欢迎消息 - 与原始版本完全一致
+            # 发送欢迎消息 - 与原始版本完全一致，无额外延迟
             welcome_msg = f"欢迎连接到服务器！当前时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
             client_socket.send(welcome_msg.encode('utf-8'))
-            print(f"[{connection_id}] 发送欢迎消息: {welcome_msg}")
+            print(f"[{connection_id}] 欢迎消息已发送")
+            
+            # 轻量级TCP状态记录 - 标记连接已建立
+            if connection_id in self.tcp_analyzer.connections:
+                tcp_conn = self.tcp_analyzer.connections[connection_id]
+                # 简单记录连接建立状态，无延迟操作
+                print(f"[{connection_id}] TCP连接状态: ESTABLISHED")
             
             while self.running:
                 try:
@@ -159,10 +188,11 @@ class AdvancedSocketServer:
                     message = data.decode('utf-8')
                     print(f"[{connection_id}] 收到: {message}")
                     
-                    # 处理特殊命令 - 简化版本
+                    # 处理特殊命令 - 简化版本，无额外日志
                     if message.lower() == 'quit':
                         response = "再见！连接即将关闭。"
                         client_socket.send(response.encode('utf-8'))
+                        print(f"[{connection_id}] 客户端主动断开连接")
                         break
                     elif message.lower() == 'time':
                         response = f"服务器时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
@@ -176,9 +206,9 @@ class AdvancedSocketServer:
                     
                     # 发送响应给客户端
                     client_socket.send(response.encode('utf-8'))
-                    print(f"[{connection_id}] 发送: {response}")
+                    print(f"[{connection_id}] 已发送响应")
                     
-                    # 简单统计更新
+                    # 简单统计更新，无日志记录
                     self.stats['total_messages'] += 1
                     
                 except socket.timeout:
@@ -198,33 +228,44 @@ class AdvancedSocketServer:
     def disconnect_client(self, client_socket, connection_id):
         """断开客户端连接"""
         try:
-            # 模拟TCP四次挥手
-            if connection_id in self.tcp_analyzer.connections:
-                tcp_conn = self.tcp_analyzer.connections[connection_id]
-                tcp_conn.simulate_server_teardown()
+            # 创建异步TCP四次挥手分析
+            def async_teardown_analysis():
+                try:
+                    if connection_id in self.tcp_analyzer.connections:
+                        tcp_conn = self.tcp_analyzer.connections[connection_id]
+                        # 异步执行四次挥手分析，不阻塞socket关闭
+                        tcp_conn.simulate_server_teardown()
+                    
+                    # 记录断开连接事件到日志
+                    if connection_id in self.clients:
+                        client_info = self.clients[connection_id]
+                        self.logger.log_connection_event("CLIENT_DISCONNECTED", {
+                            'connection_id': connection_id,
+                            'client_address': client_info.get('client_address'),
+                            'active_connections': self.stats['active_connections']
+                        })
+                except Exception as e:
+                    print(f"TCP挥手分析错误: {e}")
             
+            # 立即关闭socket，不等待分析完成
             client_socket.close()
             
             # 更新连接统计
             self.stats['active_connections'] -= 1
             
-            # 记录断开连接事件
+            # 在单独线程中执行四次挥手分析
+            teardown_thread = threading.Thread(target=async_teardown_analysis, daemon=True)
+            teardown_thread.start()
+            
+            # 移除客户端信息
             if connection_id in self.clients:
-                client_info = self.clients[connection_id]
-                self.logger.log_connection_event("CLIENT_DISCONNECTED", {
-                    'connection_id': connection_id,
-                    'client_address': client_info.get('client_address'),
-                    'active_connections': self.stats['active_connections']
-                })
-                
-                # 移除客户端信息
                 del self.clients[connection_id]
             
             print(f"[{connection_id}] 客户端已断开")
             print(f"当前活跃连接: {self.stats['active_connections']}")
             
         except Exception as e:
-            self.logger.log_error("CLIENT_DISCONNECT_ERROR", str(e), connection_id)
+            print(f"断开客户端时发生错误: {e}")
     
     def shutdown_server(self):
         """关闭服务器"""
@@ -239,6 +280,11 @@ class AdvancedSocketServer:
                     client_info['socket'].close()
                 except:
                     pass
+        
+        # 等待所有分析线程完成
+        if hasattr(self, 'analysis_threads'):
+            for thread in self.analysis_threads:
+                thread.join()
         
         # 关闭服务器套接字
         if self.server_socket:

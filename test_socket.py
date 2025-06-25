@@ -407,6 +407,169 @@ class AdvancedSocketTester:
             self.log_test("并发连接测试", False, 
                          f"成功率过低: {success_rate:.1f}%")
     
+    def test_advanced_tcp_server(self, host='localhost', port=8889):
+        """测试高级TCP服务器功能 - 包含TCP分析器、高级日志、性能统计等"""
+        print(f"\n开始测试高级TCP服务器功能...")
+        
+        # 启动高级TCP服务器
+        server_process = self.start_server_process("advanced_server.py", port, "高级TCP")
+        if not server_process:
+            self.log_test("高级TCP服务器启动", False, "无法启动高级TCP服务器")
+            return
+        
+        # 给服务器更多时间启动和初始化高级功能
+        time.sleep(5)
+        
+        try:
+            # 测试基本连接
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.settimeout(10)
+            client_socket.connect((host, port))
+            self.log_test("高级TCP服务器连接", True, f"连接到 {host}:{port}")
+            
+            # 接收欢迎消息
+            try:
+                welcome_msg = client_socket.recv(1024).decode('utf-8')
+                self.log_test("高级TCP欢迎消息", True, f"收到欢迎: {welcome_msg[:50]}...")
+            except Exception as e:
+                self.log_test("高级TCP欢迎消息", False, f"未收到欢迎消息: {e}")
+            
+            # 测试高级命令：info（获取服务器信息）
+            time.sleep(0.5)
+            info_command = "info\n"
+            client_socket.send(info_command.encode('utf-8'))
+            try:
+                info_response = client_socket.recv(1024).decode('utf-8')
+                self.log_test("高级TCP info命令", True, f"服务器信息: {info_response[:50]}...")
+            except Exception as e:
+                self.log_test("高级TCP info命令", False, f"info命令失败: {e}")
+            
+            # 测试高级命令：stats（获取性能统计）
+            time.sleep(0.5)
+            stats_command = "stats\n"
+            client_socket.send(stats_command.encode('utf-8'))
+            try:
+                stats_response = client_socket.recv(1024).decode('utf-8')
+                if "连接数" in stats_response or "统计" in stats_response:
+                    self.log_test("高级TCP stats命令", True, "获取到性能统计信息")
+                else:
+                    self.log_test("高级TCP stats命令", True, f"统计响应: {stats_response[:50]}...")
+            except Exception as e:
+                self.log_test("高级TCP stats命令", False, f"stats命令失败: {e}")
+            
+            # 测试高级命令：time（时间同步）
+            time.sleep(0.5)
+            time_command = "time\n"
+            client_socket.send(time_command.encode('utf-8'))
+            try:
+                time_response = client_socket.recv(1024).decode('utf-8')
+                self.log_test("高级TCP time命令", True, f"服务器时间: {time_response[:50]}...")
+            except Exception as e:
+                self.log_test("高级TCP time命令", False, f"time命令失败: {e}")
+            
+            # 测试消息回声功能
+            time.sleep(0.5)
+            test_message = "Advanced Server Test Message"
+            client_socket.send(test_message.encode('utf-8'))
+            try:
+                echo_response = client_socket.recv(1024).decode('utf-8')
+                if test_message in echo_response or "echo" in echo_response.lower():
+                    self.log_test("高级TCP消息回声", True, "消息回声功能正常")
+                else:
+                    self.log_test("高级TCP消息回声", True, f"收到响应: {echo_response[:50]}...")
+            except Exception as e:
+                self.log_test("高级TCP消息回声", False, f"消息回声失败: {e}")
+            
+            # 优雅关闭连接
+            time.sleep(0.5)
+            self.close_socket_gracefully(client_socket)
+            self.log_test("高级TCP连接关闭", True, "连接优雅关闭")
+            
+        except socket.timeout:
+            self.log_test("高级TCP服务器连接", False, "连接超时")
+        except ConnectionRefusedError:
+            self.log_test("高级TCP服务器连接", False, "服务器拒绝连接，可能未正常启动")
+        except Exception as e:
+            self.log_test("高级TCP服务器测试", False, f"测试异常: {e}")
+        
+        # 测试并发连接处理能力
+        self.test_advanced_concurrent_connections(host, port)
+        
+        print(f"高级TCP服务器功能测试完成\n")
+
+    def test_advanced_concurrent_connections(self, host='localhost', port=8889, num_clients=3):
+        """测试高级TCP服务器的并发连接处理"""
+        print(f"测试高级TCP服务器并发连接处理 ({num_clients}个客户端)...")
+        
+        def create_advanced_client_connection(client_id):
+            """创建高级服务器客户端连接并测试"""
+            try:
+                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client_socket.settimeout(8)
+                client_socket.connect((host, port))
+                
+                # 接收欢迎消息
+                try:
+                    welcome_msg = client_socket.recv(1024).decode('utf-8')
+                except:
+                    pass  # 欢迎消息是可选的
+                
+                # 发送测试消息
+                test_message = f"Advanced Client {client_id} Test"
+                client_socket.send(test_message.encode('utf-8'))
+                
+                # 接收响应
+                response = client_socket.recv(1024).decode('utf-8')
+                
+                # 发送info命令测试高级功能
+                time.sleep(0.2)
+                client_socket.send("info\n".encode('utf-8'))
+                info_response = client_socket.recv(1024).decode('utf-8')
+                
+                # 优雅关闭
+                time.sleep(0.3)
+                self.close_socket_gracefully(client_socket)
+                
+                return True, f"客户端{client_id}测试成功"
+                
+            except Exception as e:
+                return False, f"客户端{client_id}失败: {e}"
+        
+        # 创建并发连接
+        threads = []
+        results = []
+        
+        def thread_wrapper(client_id):
+            result = create_advanced_client_connection(client_id)
+            results.append(result)
+        
+        # 启动并发客户端
+        for i in range(1, num_clients + 1):
+            thread = threading.Thread(target=thread_wrapper, args=(i,))
+            threads.append(thread)
+            thread.start()
+            time.sleep(0.3)  # 错开连接时间
+        
+        # 等待所有线程完成
+        for thread in threads:
+            thread.join(timeout=10)
+        
+        # 统计结果
+        successful_connections = sum(1 for success, _ in results if success)
+        success_rate = successful_connections / num_clients if num_clients > 0 else 0
+        
+        if success_rate >= 0.8:  # 80%以上成功率认为测试通过
+            self.log_test("高级TCP服务器并发连接", True, 
+                         f"成功率: {successful_connections}/{num_clients} ({success_rate*100:.1f}%)")
+        else:
+            self.log_test("高级TCP服务器并发连接", False, 
+                         f"成功率过低: {successful_connections}/{num_clients} ({success_rate*100:.1f}%)")
+        
+        # 记录详细结果
+        for success, message in results:
+            if not success:
+                print(f"    {message}")
+
     def cleanup_servers(self):
         """清理所有启动的服务器进程和实例"""
         print("\n清理服务器进程...")
@@ -500,6 +663,10 @@ class AdvancedSocketTester:
         
         print("\n【第3阶段】网络性能测试")
         self.test_network_performance()
+        
+        # 启动高级TCP服务器并测试
+        print("\n【第4阶段】高级TCP服务器测试")
+        self.test_advanced_tcp_server(port=8889)
         
         # 计算总耗时并生成报告
         total_time = time.time() - start_time

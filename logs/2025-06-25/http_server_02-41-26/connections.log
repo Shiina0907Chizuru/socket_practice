@@ -1,6 +1,0 @@
-2025-06-25 02:41:34,232 - CONN - HTTP_REQUEST: {"client_ip": "127.0.0.1", "method": "GET", "path": "/", "user_agent": "python-requests/2.32.3", "timestamp": "2025-06-25T02:41:34.232878"}
-2025-06-25 02:41:36,273 - CONN - HTTP_REQUEST: {"client_ip": "127.0.0.1", "method": "GET", "path": "/api/status", "user_agent": "python-requests/2.32.3", "timestamp": "2025-06-25T02:41:36.273321"}
-2025-06-25 02:41:38,305 - CONN - HTTP_REQUEST: {"client_ip": "127.0.0.1", "method": "GET", "path": "/api/time", "user_agent": "python-requests/2.32.3", "timestamp": "2025-06-25T02:41:38.305860"}
-2025-06-25 02:41:40,339 - CONN - HTTP_REQUEST: {"client_ip": "127.0.0.1", "method": "GET", "path": "/api/clients", "user_agent": "python-requests/2.32.3", "timestamp": "2025-06-25T02:41:40.339857"}
-2025-06-25 02:41:42,381 - CONN - HTTP_REQUEST: {"client_ip": "127.0.0.1", "method": "POST", "path": "/api/echo", "user_agent": "python-requests/2.32.3", "timestamp": "2025-06-25T02:41:42.381944"}
-2025-06-25 02:41:44,440 - CONN - HTTP_REQUEST: {"client_ip": "127.0.0.1", "method": "GET", "path": "/nonexistent", "user_agent": "python-requests/2.32.3", "timestamp": "2025-06-25T02:41:44.440213"}

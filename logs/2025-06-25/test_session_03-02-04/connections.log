@@ -1,2 +1,0 @@
-2025-06-25 03:02:04,633 - CONN - TEST_EVENT: {"test": "data"}
-2025-06-25 03:02:04,635 - CONN - CONNECTION_CREATED: {"connection_id": "test_client", "type": "CLIENT", "timestamp": "2025-06-25T03:02:04.635493"}

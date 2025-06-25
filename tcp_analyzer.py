@@ -118,22 +118,24 @@ class TCPConnection:
         self.start_handshake_analysis()
         
         # 服务器监听状态
-        self._change_state(TCPState.LISTEN, "服务器开始监听连接")
+        self._change_state(TCPState.LISTEN, "服务器监听状态")
+        self.log_handshake_step(1, "服务器处于监听状态，等待客户端连接", "LISTEN")
+        time.sleep(0.01)  # 减少延迟
         
-        # 步骤1: 收到客户端SYN
-        self.log_handshake_step(1, "收到客户端SYN包，seq=x", "SYN")
-        self._change_state(TCPState.SYN_RCVD, "收到SYN，准备响应")
-        time.sleep(0.1)
+        # 收到客户端SYN
+        self._change_state(TCPState.SYN_RCVD, "收到客户端SYN包")
+        self.log_handshake_step(2, "收到客户端SYN包，seq=x", "SYN")
+        time.sleep(0.01)  # 减少延迟
         
-        # 步骤2: 服务器发送SYN+ACK
-        self.log_handshake_step(2, "服务器发送SYN+ACK包，seq=y, ack=x+1", "SYN+ACK")
-        time.sleep(0.1)
+        # 服务器发送SYN+ACK
+        self.log_handshake_step(3, "服务器发送SYN+ACK包，seq=y, ack=x+1", "SYN+ACK")
+        time.sleep(0.01)  # 减少延迟
         
-        # 步骤3: 收到客户端ACK
-        self.log_handshake_step(3, "收到客户端ACK包，ack=y+1，握手完成", "ACK")
+        # 收到客户端ACK，连接建立
         self._change_state(TCPState.ESTABLISHED, "连接建立成功")
+        self.log_handshake_step(4, "收到客户端ACK包，ack=y+1，握手完成", "ACK")
         
-        print("✅ 三次握手完成，连接建立！")
+        print("✅ 服务器端三次握手完成，连接建立！")
     
     def start_teardown_analysis(self):
         """开始四次挥手分析"""
@@ -193,24 +195,24 @@ class TCPConnection:
         self.start_teardown_analysis()
         
         # 步骤1: 收到客户端FIN
-        self.log_teardown_step(1, "收到客户端FIN包", "FIN")
-        self._change_state(TCPState.CLOSE_WAIT, "准备关闭连接")
-        time.sleep(0.1)
+        self.log_teardown_step(1, "收到客户端FIN包，开始挥手过程", "FIN")
+        self._change_state(TCPState.CLOSE_WAIT, "收到FIN，进入CLOSE_WAIT")
+        time.sleep(0.01)  # 减少延迟
         
-        # 步骤2: 发送ACK确认
-        self.log_teardown_step(2, "发送ACK确认客户端FIN", "ACK")
-        time.sleep(0.1)
+        # 步骤2: 服务器发送ACK确认
+        self.log_teardown_step(2, "服务器发送ACK确认客户端FIN", "ACK")
+        time.sleep(0.01)  # 减少延迟
         
-        # 步骤3: 发送FIN
-        self._change_state(TCPState.LAST_ACK, "等待最后ACK")
-        self.log_teardown_step(3, "服务器发送FIN包", "FIN")
-        time.sleep(0.1)
+        # 步骤3: 服务器发送FIN
+        self.log_teardown_step(3, "服务器发送FIN包，准备关闭连接", "FIN")
+        self._change_state(TCPState.LAST_ACK, "发送FIN，等待最后ACK")
+        time.sleep(0.01)  # 减少延迟
         
-        # 步骤4: 收到客户端ACK
-        self.log_teardown_step(4, "收到客户端最后ACK确认", "ACK")
-        self._change_state(TCPState.CLOSED, "连接关闭完成")
+        # 步骤4: 收到客户端最后的ACK
+        self.log_teardown_step(4, "收到客户端最后ACK，挥手完成", "ACK")
+        self._change_state(TCPState.CLOSED, "连接完全关闭")
         
-        print("✅ 四次挥手完成，连接关闭！")
+        print("✅ 服务器端四次挥手完成，连接关闭！")
     
     def get_connection_summary(self):
         """获取连接总结信息"""
